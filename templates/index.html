@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hand Gesture Recognition</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        img {
+            max-width: 100%;
+            border: 2px solid #333;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        p {
+            font-size: 18px;
+            margin-top: 10px;
+            /* Additional styling for the predicted text */
+            color: #007bff; /* Blue color */
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Hand Gesture Recognition</h1>
+    <img src="{{ url_for('video_feed') }}" alt="Hand Gesture Recognition">
+    <p>Predicted Text: <span id="predictedText">Loading...</span></p>
+
+    <script>
+        let currentSentence = ''; // Variable to store the current predicted sentence
+
+        function updatePredictedSentence() {
+            // Use fetch or another AJAX method to get the predicted text from the server
+            fetch('/get_predicted_text')
+                .then(response => response.json())  // Parse the response as JSON
+                .then(data => {
+                    // Check if 'predicted_text' is not undefined
+                    if (data.predicted_text !== undefined) {
+                        // Update the current sentence with the new prediction
+                        currentSentence += data.predicted_text;
+
+                        // Display the predicted sentence
+                        document.getElementById('predictedText').innerText = currentSentence;
+                    }
+                });
+        }
+
+        // Update the predicted sentence every 4 seconds
+        setInterval(updatePredictedSentence, 4000);
+
+        // Handle the Tab key press to add a space
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Tab') {
+                event.preventDefault(); // Prevent the default Tab key behavior
+
+                // Add a space to the current sentence
+                currentSentence += ' ';
+
+                // Display the updated sentence
+                document.getElementById('predictedText').innerText = currentSentence;
+            }
+        });
+
+        // Handle the Enter key press to add a new line
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault(); // Prevent the default Enter key behavior
+
+                // Add a new line to the current sentence
+                currentSentence += '\n';
+
+                // Display the updated sentence
+                document.getElementById('predictedText').innerText = currentSentence;
+            }
+        });
+    </script>
+</body>
+</html>
